@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Constitution</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.8;
+            margin: 20px;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        .constitution {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+            border: 2px solid #444;
+            border-radius: 15px;
+            background: #1e1e1e;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        h1, h2 {
+            text-align: center;
+            color: #f48fb1;
+        }
+        h1 {
+            text-shadow: 0 2px 5px rgba(244, 143, 177, 0.5);
+        }
+        h3 {
+            color: #90caf9;
+            text-shadow: 0 1px 3px rgba(144, 202, 249, 0.5);
+        }
+        p {
+            color: #e0e0e0;
+            margin-bottom: 15px;
+        }
+        .important {
+            color: #f48fb1;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+        .relevant {
+            color: #81c784;
+            font-weight: bold;
+        }
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #90caf9;
+            color: #121212;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #64b5f6;
+        }
+        hr {
+            border: 1px solid #555;
+            margin: 40px 0;
+        }
+        .article-start {
+            color: #ce93d8;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 30px;
+        }
+        .note {
+            font-size: 14px;
+            color: #bdbdbd;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .highlight {
+            background-color: #333;
+            color: #f48fb1;
+            cursor: pointer;
+        }
+        .highlight-error {
+            background-color: #ff0000;
+            color: #ffffff;
+        }
+        .search-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .search-input {
+            padding: 10px;
+            width: 60%;
+            font-size: 16px;
+            border: 2px solid #444;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        .quiz-container {
+            margin-top: 40px;
+            text-align: center;
+        }
+        .quiz-question {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .quiz-options button {
+            display: inline-block;
+            margin: 10px;
+        }
+    </style>
+    <script>
+        function readArticle(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                const text = section.innerText.replace(/\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDE4F]|\uD83D[\uDE80-\uDEF6]/g, ''); // Remove emojis
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 1;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function readFullConstitution() {
+            const articles = document.querySelectorAll('h2');
+            let text = '';
+            articles.forEach((article, index) => {
+                text += `Article ${index + 1}: ` + article.innerText.replace(/\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDE4F]|\uD83D[\uDE80-\uDEF6]/g, '') + '. ';
+                text += article.nextElementSibling.innerText + '\n';
+            });
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 1;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function readHighlightedText() {
+            const selection = window.getSelection().toString();
+            if (selection) {
+                const utterance = new SpeechSynthesisUtterance(selection);
+                utterance.rate = 1;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        document.addEventListener('mouseup', () => {
+            const selection = window.getSelection();
+            if (selection && selection.toString().length > 0) {
+                const range = selection.getRangeAt(0);
+                const highlightedText = document.createElement('span');
+                highlightedText.classList.add('highlight');
+                highlightedText.textContent = selection.toString();
+                range.deleteContents();
+                range.insertNode(highlightedText);
+                readHighlightedText();
+            }
+        });
+
+        function toggleNightMode() {
+            document.body.classList.toggle('light-mode');
+            if (document.body.classList.contains('light-mode')) {
+                document.body.style.backgroundColor = '#ffffff';
+                document.body.style.color = '#121212';
+            } else {
+                document.body.style.backgroundColor = '#121212';
+                document.body.style.color = '#e0e0e0';
+            }
+        }
+
+        function searchConstitution() {
+            const searchInput = document.getElementById('search-input').value.toLowerCase();
+            const sections = document.querySelectorAll('.section, h2');
+            const keywords = {
+                'general conduct': ['conduct', 'behavior', 'rules', 'respect'],
+                'content guidelines': ['content', 'posting', 'media', 'nsfw'],
+                'behavior and interaction': ['harassment', 'bullying', 'interaction', 'threats'],
+                'moderation and enforcement': ['moderation', 'staff', 'enforcement', 'ping']
+            };
+            
+            let found = false;
+            sections.forEach(section => {
+                const sectionText = section.innerText.toLowerCase();
+                if (sectionText.includes(searchInput)) {
+                    section.style.backgroundColor = '#333';
+                    section.scrollIntoView({ behavior: 'smooth' });
+                    found = true;
+                } else {
+                    section.style.backgroundColor = 'transparent';
+                }
+            });
+
+            if (!found) {
+                for (const [key, terms] of Object.entries(keywords)) {
+                    if (terms.some(term => searchInput.includes(term))) {
+                        const section = document.querySelector(`#${key.replace(/ /g, '').toLowerCase()}`);
+                        if (section) {
+                            section.style.backgroundColor = '#333';
+                            section.scrollIntoView({ behavior: 'smooth' });
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        function startQuiz() {
+            const quizContainer = document.getElementById('quiz-container');
+            quizContainer.innerHTML = '';
+
+            const questions = [
+                {
+                    question: 'What should you do if someone threatens another member?',
+                    options: ['Ignore it', 'Report it to moderators', 'Join in', 'Do nothing'],
+                    correct: 'Report it to moderators',
+                    sectionId: 'section7'
+                },
+                {
+                    question: 'Where should you post memes?',
+                    options: ['Anywhere', 'In designated channels', 'In private messages', 'In content guidelines'],
+                    correct: 'In designated channels',
+                    sectionId: 'section4'
+                },
+                {
+                    question: 'What is the consequence of sharing NSFW content?',
+                    options: ['No consequence', 'Timeout', 'Warning or mute', 'Ban'],
+                    correct: 'Warning or mute',
+                    sectionId: 'section3'
+                },
+                {
+                    question: 'How should members treat each other?',
+                    options: ['With respect and dignity', 'Ignore each other', 'Compete aggressively', 'Disregard opinions'],
+                    correct: 'With respect and dignity',
+                    sectionId: 'section2'
+                },
+                {
+                    question: 'Who should you never ping unless essential?',
+                    options: ['Moderators', 'Founders', 'Members', 'Everyone'],
+                    correct: 'Founders',
+                    sectionId: 'section8'
+                },
+                {
+                    question: 'What should you do if you see harassment?',
+                    options: ['Join in', 'Report it', 'Ignore it', 'Encourage it'],
+                    correct: 'Report it',
+                    sectionId: 'section6'
+                },
+                {
+                    question: 'Is it allowed to share NSFW content?',
+                    options: ['Yes', 'No'],
+                    correct: 'No',
+                    sectionId: 'section3'
+                },
+                {
+                    question: 'What is the consequence for pinging staff unnecessarily?',
+                    options: ['Ban', 'Warning or timeout', 'No consequence', 'Promotion'],
+                    correct: 'Warning or timeout',
+                    sectionId: 'section8'
+                },
+                {
+                    question: 'What is expected in terms of behavior within the community?',
+                    options: ['Common sense and logic', 'Ignoring rules', 'Aggressive behavior', 'Breaking guidelines'],
+                    correct: 'Common sense and logic',
+                    sectionId: 'section1'
+                },
+                {
+                    question: 'What is strictly forbidden when it comes to threats?',
+                    options: ['Mild jokes', 'Threatening harm or sexual assault', 'Friendly teasing', 'Sarcasm'],
+                    correct: 'Threatening harm or sexual assault',
+                    sectionId: 'section7'
+                },
+                {
+                    question: 'Where should you look for content posting rules?',
+                    options: ['Article II', 'Preamble', 'Article IV', 'General Conduct'],
+                    correct: 'Article II',
+                    sectionId: 'article2'
+                },
+                {
+                    question: 'What happens if a credible threat is made?',
+                    options: ['Ignored', 'Immediate ban', 'Warning only', 'Timeout'],
+                    correct: 'Immediate ban',
+                    sectionId: 'section7'
+                },
+                {
+                    question: 'What are the consequences of bullying?',
+                    options: ['Nothing', 'Warning, timeout, mute', 'Promotion', 'Free pass'],
+                    correct: 'Warning, timeout, mute',
+                    sectionId: 'section6'
+                },
+                {
+                    question: 'What type of content is strictly prohibited?',
+                    options: ['Funny memes', 'NSFW Content', 'Constructive feedback', 'Event announcements'],
+                    correct: 'NSFW Content',
+                    sectionId: 'section3'
+                },
+                {
+                    question: 'When can you ping the staff?',
+                    options: ['Whenever', 'Only when necessary', 'To say hi', 'For fun'],
+                    correct: 'Only when necessary',
+                    sectionId: 'section8'
+                }
+            ];
+
+            let currentQuestionIndex = 0;
+            showQuestion(currentQuestionIndex);
+
+            function showQuestion(index) {
+                quizContainer.innerHTML = '';
+                const questionObj = questions[index];
+
+                const question = document.createElement('div');
+                question.className = 'quiz-question';
+                question.innerText = questionObj.question;
+                quizContainer.appendChild(question);
+
+                const quizOptions = document.createElement('div');
+                quizOptions.className = 'quiz-options';
+
+                questionObj.options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.innerText = option;
+                    button.onclick = () => {
+                        if (option === questionObj.correct) {
+                            alert('Correct!');
+                            currentQuestionIndex++;
+                            if (currentQuestionIndex < questions.length) {
+                                showQuestion(currentQuestionIndex);
+                            } else {
+                                alert('You have completed the quiz!');
+                                quizContainer.innerHTML = '<button onclick="startQuiz()">Take the Community Quiz Again</button>';
+                            }
+                        } else {
+                            alert('Incorrect. Please review the relevant section.');
+                            highlightAnswer(questionObj.sectionId);
+                        }
+                    };
+                    quizOptions.appendChild(button);
+                });
+
+                quizContainer.appendChild(quizOptions);
+            }
+        }
+
+        function highlightAnswer(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+                section.classList.add('highlight-error');
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="constitution">
+        <h1>Community Constitution</h1>
+
+        <button onclick="readFullConstitution()">Read Full Constitution</button>
+        <button onclick="toggleNightMode()">Toggle Light/Dark Mode</button>
+
+        <div class="note">Note: You can also highlight text to have it read aloud. Also there a shit ton of bugs and um there a quiz at the end take it if shit breaks too the point where it ain usable talk to me</div>
+
+        <div class="search-container">
+            <input type="text" id="search-input" class="search-input" placeholder="Search the constitution...">
+            <button onclick="searchConstitution()">Search</button>
+        </div>
+
+        <div class="article-start">Start of Preamble</div>
+        <h2 id="preamble">Preamble</h2>
+        <p>We, the members of this community, establish this constitution to promote a respectful, inclusive, and safe environment for all. These rules and guidelines are designed to ensure harmony, mutual respect, and accountability among all members. Members are expected to adhere to these principles in all interactions within the community.</p>
+        <button onclick="readArticle('preamble')">Read Preamble</button>
+
+        <hr>
+
+        <div class="article-start">Start of Article I</div>
+        <h2 id="article1">Article I: General Conduct</h2>
+
+        <div class="section" id="section1">
+            <h3>Section 1: Common Sense and Logic</h3>
+            <p>Members are expected to use common sense and basic human logic in all interactions.</p>
+            <button onclick="readArticle('section1')">Read Section 1</button>
+        </div>
+
+        <div class="section" id="section2">
+            <h3>Section 2: Respect and Dignity</h3>
+            <p class="important">Treat all members with respect and dignity, regardless of rank, status, or opinions.</p>
+            <p class="relevant">Consequence: Warning, timeout, or mute depending on severity.</p>
+            <button onclick="readArticle('section2')">Read Section 2</button>
+        </div>
+
+        <hr>
+
+        <div class="article-start">Start of Article II</div>
+        <h2 id="article2">Article II: Content Guidelines</h2>
+
+        <div class="section" id="section3">
+            <h3>Section 1: Prohibited Content</h3>
+            <p class="important">NSFW Content:</p>
+            <p class="relevant">Sharing NSFW content is strictly prohibited.</p>
+            <p class="relevant">Consequence: Warning, timeout, mute.</p>
+            <button onclick="readArticle('section3')">Read Section 1</button>
+        </div>
+
+        <div class="section" id="section4">
+            <h3>Section 2: Meme and Media Posting</h3>
+            <p class="important">Post memes in their designated channels.</p>
+            <p class="relevant">Consequence: Warning or timeout.</p>
+            <button onclick="readArticle('section4')">Read Section 2</button>
+        </div>
+
+        <hr>
+
+        <div class="article-start">Start of Article III</div>
+        <h2 id="article3">Article III: Behavior and Interaction</h2>
+
+        <div class="section" id="section6">
+            <h3>Section 1: Harassment and Bullying</h3>
+            <p class="important">Harassment or bullying is prohibited.</p>
+            <p class="relevant">Consequence: Warning, timeout, mute.</p>
+            <button onclick="readArticle('section6')">Read Section 1</button>
+        </div>
+
+        <div class="section" id="section7">
+            <h3>Section 4: Threats</h3>
+            <p class="important">Threatening harm or sexual assault is strictly forbidden.</p>
+            <p class="relevant">Consequence: Immediate ban for credible threats; warning or timeout otherwise.</p>
+            <button onclick="readArticle('section7')">Read Section 4</button>
+        </div>
+
+        <hr>
+
+        <div class="article-start">Start of Article IV</div>
+        <h2 id="article4">Article IV: Moderation and Enforcement</h2>
+
+        <div class="section" id="section8">
+            <h3>Section 1: Pinging Staff</h3>
+            <p class="relevant">Only ping staff when necessary. <span class="important">Never ping Founders unless essential.</span></p>
+            <p class="relevant">Consequence: Warning or timeout.</p>
+            <button onclick="readArticle('section8')">Read Section 1</button>
+        </div>
+    </div>
+
+    <div class="quiz-container" id="quiz-container">
+        <button onclick="startQuiz()">Take the Community Quiz</button>
+    </div>
+</body>
+</html>
